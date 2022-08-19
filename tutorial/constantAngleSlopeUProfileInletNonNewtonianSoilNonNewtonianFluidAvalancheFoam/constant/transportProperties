@@ -1,0 +1,95 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2012                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+phases
+(
+     liquid
+     {
+         //transportModel HerschelBulkley;
+         //HerschelBulkleyCoeffs
+         //{
+         //    nu0   [ 0 2 -1 0 0 0 0 ] 1e06;
+         //    tau0  [ 0 2 -2 0 0 0 0 ] 1e-01;//1e-06;
+         //    k     [ 0 2 -1 0 0 0 0 ] 1e-05;
+         //    n     [ 0 0  0 0 0 0 0 ] 0.7;
+         //}
+         transportModel  Newtonian;
+         nu         1e-06;
+         rho        1000;
+     }
+
+     entrained
+     {
+         //transportModel HerschelBulkley;
+         //HerschelBulkleyCoeffs
+         //{
+         //    nu0   [ 0 2 -1 0 0 0 0 ] 1e06;
+         //    tau0  [ 0 2 -2 0 0 0 0 ] 1e-01;//1e-06;
+         //    k     [ 0 2 -1 0 0 0 0 ] 1e-05;
+         //    n     [ 0 0  0 0 0 0 0 ] 0.7;
+         //}
+         transportModel  Newtonian;
+         nu         1e-06;
+         rho        1500;
+     }
+
+     soil
+     {
+         //transportModel HerschelBulkley;
+         //HerschelBulkleyCoeffs
+         //{
+         //    nu0   [ 0 2 -1 0 0 0 0 ] 1e06;
+         //    tau0  [ 0 2 -2 0 0 0 0 ] 1;//1e-06;
+         //    k     [ 0 2 -1 0 0 0 0 ] 1e-03;
+         //    n     [ 0 0  0 0 0 0 0 ] 0.7;
+         //}
+         transportModel  Newtonian;
+         nu         1e-05;
+         rho        2000;
+     }
+
+     gas
+     {
+         transportModel  Newtonian;
+         nu         1.48e-05;
+         rho        1;
+     }
+);
+
+sigmas
+(
+    (gas liquid) 0//.07
+    (gas soil) 0//.07
+    (gas entrained) 0//.07
+    (liquid soil) 0//.07
+    (liquid entrained) 0//.07
+    (soil entrained) 0//.07
+);
+
+/*massTransfer
+(
+    (soil entrained)
+    {
+        type entrainment;
+		entrainmentCoeffs
+		{
+			entrCoeff		1;
+		}
+    }
+)*/
+
+// ************************************************************************* //
