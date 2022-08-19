@@ -42,6 +42,7 @@ SourceFiles
 #include "volFields.H"
 #include "dictionaryEntry.H"
 #include "incompressible/viscosityModels/viscosityModel/viscosityModel.H"
+#include "invariants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,7 +63,9 @@ class phase
         dictionary phaseDict_;
         autoPtr<viscosityModel> nuModel_;
         dimensionedScalar rho_;
-
+        const volVectorField& U_;
+		//- Strain rate tensor
+		volScalarField strainRateTensor2Inv_;
 
 public:
 
@@ -143,8 +146,21 @@ public:
             return rho_;
         }
 
+		const volScalarField& strainRateTensor2Inv() const
+		{
+			return strainRateTensor2Inv_;
+		}
+
+		volScalarField& strainRateTensor2Inv()
+		{
+			return strainRateTensor2Inv_;
+		}
+
         //- Correct the phase properties
         void correct();
+
+        //- Calculate straint rate tensor 2-nd invariant
+        void calcStrainRateTensor2Inv();
 
         //-Inherit read from volScalarField
         using volScalarField::read;

@@ -22,4 +22,5 @@ EXE_LIBS = \
     -lturbulenceModels \
     -lincompressibleTurbulenceModels \
     -ldynamicFvMesh \
-	-L$(FOAM_USER_LIBBIN)
+	-L$(FOAM_USER_LIBBIN) \
+    -lavalancheFoam

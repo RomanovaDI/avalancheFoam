@@ -147,6 +147,8 @@ int main(int argc, char *argv[])
             {
                 turbulence->correct();
             }
+
+            mixture.calcStrainRateTensors2Inv();
         }
 
         runTime.write();

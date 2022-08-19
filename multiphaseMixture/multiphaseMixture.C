@@ -128,6 +128,22 @@ Foam::multiphaseMixture::multiphaseMixture
 {
     rhoPhi_.setOriented();
 
+	interfaceDictTable massTransferModelsDict(lookup("massTransfer"));
+
+    forAllConstIters(massTransferModelsDict, iter)
+    {
+        massTransferModels_.set
+        (
+            iter.key(),
+            massTransferModel::New
+            (
+                iter(),
+                *phases_.lookup(iter.key().first()),
+                *phases_.lookup(iter.key().second())
+            ).ptr()
+        );
+    }
+
     calcAlphas();
     alphas_.write();
 }
@@ -626,6 +642,10 @@ void Foam::multiphaseMixture::solveAlphas
             );
         }
 
+		// Adding Sp and Su terms to MULES limit
+		const volScalarField Sp(mtmSp(alpha, massTransferCoeffs()));
+		const volScalarField Su(mtmSu(alpha, massTransferCoeffs()));
+
         MULES::limit
         (
             1.0/mesh_.time().deltaT().value(),
@@ -633,8 +653,8 @@ void Foam::multiphaseMixture::solveAlphas
             alpha,
             phi_,
             alphaPhiCorr,
-            zeroField(),
-            zeroField(),
+            Sp(),//zeroField(),
+            Su(),//zeroField(),
             oneField(),
             zeroField(),
             true
@@ -659,6 +679,30 @@ void Foam::multiphaseMixture::solveAlphas
         dimensionedScalar(dimless, Zero)
     );
 
+    volScalarField sumSp
+    (
+        IOobject
+        (
+            "sumSp",
+            mesh_.time().timeName(),
+            mesh_
+        ),
+        mesh_,
+        dimensionedScalar("sumSp", dimless/dimTime, 0)
+    );
+
+    volScalarField sumSu
+    (
+        IOobject
+        (
+            "sumSu",
+            mesh_.time().timeName(),
+            mesh_
+        ),
+        mesh_,
+        dimensionedScalar("sumSu", dimless/dimTime, 0)
+    );
+
     phasei = 0;
 
     for (phase& alpha : phases_)
@@ -666,11 +710,17 @@ void Foam::multiphaseMixture::solveAlphas
         surfaceScalarField& alphaPhi = alphaPhiCorrs[phasei];
         alphaPhi += upwind<scalar>(mesh_, phi_).flux(alpha);
 
+		// Adding Sp and Su terms to MULES explicit solve
+		const volScalarField Sp(mtmSp(alpha, massTransferCoeffs()));
+		const volScalarField Su(mtmSu(alpha, massTransferCoeffs()));
+
         MULES::explicitSolve
         (
             geometricOneField(),
             alpha,
-            alphaPhi
+            alphaPhi,
+			Sp(),
+			Su()
         );
 
         rhoPhi_ += alphaPhi*alpha.rho();
@@ -681,7 +731,21 @@ void Foam::multiphaseMixture::solveAlphas
             << ' ' << max(alpha).value()
             << endl;
 
+        Info<< alpha.name() << " Sp volume fraction, min, max = "
+            << Sp.weightedAverage(mesh_.V()).value()
+            << ' ' << min(Sp).value()
+            << ' ' << max(Sp).value()
+            << endl;
+
+        Info<< alpha.name() << " Su volume fraction, min, max = "
+            << Su.weightedAverage(mesh_.V()).value()
+            << ' ' << min(Su).value()
+            << ' ' << max(Su).value()
+            << endl;
+
         sumAlpha += alpha;
+        sumSp += Sp;
+        sumSu += Su;
 
         ++phasei;
     }
@@ -692,6 +756,18 @@ void Foam::multiphaseMixture::solveAlphas
         << ' ' << max(sumAlpha).value()
         << endl;
 
+    Info<< "Sp-sum volume fraction, min, max = "
+        << sumSp.weightedAverage(mesh_.V()).value()
+        << ' ' << min(sumSp).value()
+        << ' ' << max(sumSp).value()
+        << endl;
+
+    Info<< "Su-sum volume fraction, min, max = "
+        << sumSu.weightedAverage(mesh_.V()).value()
+        << ' ' << min(sumSu).value()
+        << ' ' << max(sumSu).value()
+        << endl;
+
     // Correct the sum of the phase-fractions to avoid 'drift'
     volScalarField sumCorr(1.0 - sumAlpha);
     for (phase& alpha : phases_)
@@ -700,6 +776,125 @@ void Foam::multiphaseMixture::solveAlphas
     }
 
     calcAlphas();
+}
+
+
+void Foam::multiphaseMixture::calcStrainRateTensors2Inv()
+{
+    for (phase& phase : phases_)
+    {
+        phase.calcStrainRateTensor2Inv();
+    }
+}
+
+
+Foam::autoPtr<Foam::multiphaseMixture::massTransferCoeffFields>
+Foam::multiphaseMixture::massTransferCoeffs() const
+{
+    autoPtr<massTransferCoeffFields> massTransferCoeffsPtr(new massTransferCoeffFields);
+
+    forAllConstIters(massTransferModels_, iter)
+    {
+        const massTransferModel& mtm = *iter();
+		const tmp<volScalarField> K = mtm.K();
+
+        volScalarField* Kptr = (mtm.K()).ptr();
+
+        massTransferCoeffsPtr().set(iter.key(), Kptr);
+    }
+
+    return massTransferCoeffsPtr;
+}
+
+
+// Calculation of the source terms in alphaEqn
+Foam::tmp<Foam::volScalarField>Foam::multiphaseMixture::mtmSp
+(
+	const phase& phasei,
+	const massTransferCoeffFields& massTransferCoeffField
+) const
+{
+	tmp<volScalarField> tmtmSp
+	(
+		new volScalarField
+		(
+			IOobject
+			(
+				"mtmSp" ,
+				mesh_.time().timeName(),
+				mesh_
+			),
+			mesh_,
+			dimensionedScalar
+			(
+				"mtmSp",
+				dimless/dimTime,
+				0
+			)
+		)
+	);
+	massTransferModelTable::const_iterator mtmIter = massTransferModels_.begin();
+	massTransferCoeffFields::const_iterator cIter = massTransferCoeffField.begin();
+	for
+	(
+		;
+    	mtmIter.good() && cIter.good();
+		++mtmIter, ++cIter
+	)
+	{
+		if (&phasei == &mtmIter()->phase1())
+		{
+			const volScalarField Sp = *cIter();
+			tmtmSp.ref() = Sp;
+		}
+	}
+	return tmtmSp;
+}
+
+
+Foam::tmp<Foam::volScalarField>Foam::multiphaseMixture::mtmSu
+(
+	const phase& phasei,
+	const massTransferCoeffFields& massTransferCoeffField
+) const
+{
+	tmp<volScalarField> tmtmSu
+	(
+		new volScalarField
+		(
+			IOobject
+			(
+				"mtmSu" ,
+				mesh_.time().timeName(),
+				mesh_
+			),
+			mesh_,
+			dimensionedScalar
+			(
+				"mtmSu",
+				dimless/dimTime,
+				0
+			)
+		)
+	);
+	massTransferModelTable::const_iterator mtmIter = massTransferModels_.begin();
+	massTransferCoeffFields::const_iterator cIter = massTransferCoeffField.begin();
+	for
+	(
+		;
+    	mtmIter.good() && cIter.good();
+		++mtmIter, ++cIter
+	)
+	{
+		if (&phasei == &mtmIter()->phase2())
+		{
+			const phase *phasePtr = &mtmIter()->phase1();
+			const volScalarField alpha = *phasePtr;
+			const volScalarField Su = *cIter();
+			tmtmSu.ref() = Su*alpha*scalar(-1);
+		}
+	}
+	return tmtmSu;
 }
 
 

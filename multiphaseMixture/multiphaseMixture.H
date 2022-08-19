@@ -51,6 +51,7 @@ SourceFiles
 #include "PtrDictionary.H"
 #include "volFields.H"
 #include "surfaceFields.H"
+#include "massTransferModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -121,6 +122,11 @@ public:
             }
     };
 
+    typedef HashPtrTable<massTransferModel, interfacePair, interfacePair::hash>
+        massTransferModelTable;
+
+    typedef HashPtrTable<volScalarField, interfacePair, interfacePair::hash>
+        massTransferCoeffFields;
 
 private:
 
@@ -143,6 +149,11 @@ private:
 
         sigmaTable sigmas_;
         dimensionSet dimSigma_;
+
+        typedef HashTable<dictionary, interfacePair, interfacePair::hash>
+            interfaceDictTable;
+
+        massTransferModelTable massTransferModels_;
 
         //- Stabilisation for normalisation of the interface normal
         const dimensionedScalar deltaN_;
@@ -258,6 +269,31 @@ public:
 
         //- Solve for the mixture phase-fractions
         void solve();
+
+		//- Calculate strain rate tensors invariants
+		void calcStrainRateTensors2Inv();
+
+        //- Return the table of mass transfer models
+        const massTransferModelTable& massTransferModels() const
+        {
+            return massTransferModels_;
+        }
+
+        //- Return the drag coefficients for all of the interfaces
+        autoPtr<massTransferCoeffFields> massTransferCoeffs() const;
+
+		//− define the Su and Sp terms for alphaEqn
+		tmp<volScalarField> mtmSp
+		(
+			const phase& phase ,
+			const massTransferCoeffFields& massTransferCoeffs
+		) const;
+
+		tmp<volScalarField> mtmSu
+		(
+			const phase& phase ,
+			const massTransferCoeffFields& massTransferCoeffs
+		) const;
 
         //- Correct the mixture properties
         void correct();

@@ -27,6 +27,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "phase.H"
+#include "fvcGrad.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -62,7 +63,21 @@ Foam::phase::phase
             phi
         )
     ),
-    rho_("rho", dimDensity, phaseDict_)
+    rho_("rho", dimDensity, phaseDict_),
+	U_(U),
+	strainRateTensor2Inv_
+    (
+        IOobject
+        (
+            IOobject::groupName("strainRateTensor2Inv", phaseName),
+            U.mesh().time().timeName(),
+            U.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+		U.mesh(),
+		dimensionSet(0,0,-2,0,0)
+    )
 {}
 
 
@@ -72,6 +87,15 @@ Foam::autoPtr<Foam::phase> Foam::phase::clone() const
 {
     NotImplemented;
     return nullptr;
+}
+
+void Foam::phase::calcStrainRateTensor2Inv()
+{
+    Info<< "phaseModel.calcStrainRateTensor2Inv()" << nl << endl;
+	volScalarField& alpha = *this;
+	invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_)));
+	strainRateTensor2Inv_ *= alpha;
+    strainRateTensor2Inv_.clip(0, 1);
 }
 
 
