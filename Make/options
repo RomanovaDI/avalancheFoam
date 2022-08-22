@@ -16,11 +16,10 @@ EXE_LIBS = \
     -lfvOptions \
     -lmeshTools \
     -lsampling \
-    -lmultiphaseInterFoam \
     -linterfaceProperties \
     -lincompressibleTransportModels \
     -lturbulenceModels \
     -lincompressibleTurbulenceModels \
     -ldynamicFvMesh \
 	-L$(FOAM_USER_LIBBIN) \
-    -lavalancheFoam
+    -lavalancheMultiphaseMixture

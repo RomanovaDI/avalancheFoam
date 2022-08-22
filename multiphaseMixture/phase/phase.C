@@ -91,7 +91,6 @@ Foam::autoPtr<Foam::phase> Foam::phase::clone() const
 
 void Foam::phase::calcStrainRateTensor2Inv()
 {
-    Info<< "phaseModel.calcStrainRateTensor2Inv()" << nl << endl;
 	volScalarField& alpha = *this;
 	invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_)));
 	strainRateTensor2Inv_ *= alpha;
