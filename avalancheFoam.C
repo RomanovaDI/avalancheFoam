@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
                 }
             }
 
+            mixture.calcStrainRateTensors2Inv();
             mixture.solve();
             rho = mixture.rho();
 
@@ -147,8 +148,6 @@ int main(int argc, char *argv[])
             {
                 turbulence->correct();
             }
-
-            mixture.calcStrainRateTensors2Inv();
         }
 
         runTime.write();

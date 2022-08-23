@@ -64,6 +64,7 @@ class phase
         autoPtr<viscosityModel> nuModel_;
         dimensionedScalar rho_;
         const volVectorField& U_;
+		volScalarField magGradAlpha_;
 		//- Strain rate tensor
 		volScalarField strainRateTensor2Inv_;
 
@@ -146,6 +147,16 @@ public:
             return rho_;
         }
 
+		const volScalarField& magGradAlpha() const
+		{
+			return magGradAlpha_;
+		}
+
+		volScalarField& magGradAlpha()
+		{
+			return magGradAlpha_;
+		}
+
 		const volScalarField& strainRateTensor2Inv() const
 		{
 			return strainRateTensor2Inv_;
@@ -158,6 +169,8 @@ public:
 
         //- Correct the phase properties
         void correct();
+
+        void calcMagGradAlpha();
 
         //- Calculate straint rate tensor 2-nd invariant
         void calcStrainRateTensor2Inv();

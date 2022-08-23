@@ -66,15 +66,18 @@ Foam::massTransferModels::entrainment::entrainment
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+//phase1 - from, phase2 - to
 Foam::tmp<Foam::volScalarField> Foam::massTransferModels::entrainment::K() const
 {
+	//volScalarField& alpha2 = phase2_;
 	tmp<volScalarField> Kvalue(
 		//min(
 		//	dimensionedScalar(dimensionSet(0,0,-2,0,0), 1),
 		//	phase1_.strainRateTensor2Inv()
 		//	)*
 		phase1_.strainRateTensor2Inv()*
-		dimensionedScalar(dimensionSet(0,0,1,0,0),-1)*
+		//phase1_.magGradAlpha()*
+		dimensionedScalar(dimensionSet(0,0,-1,0,0),-1)*
 		entrCoeff_
 		);
     
