@@ -118,7 +118,7 @@ void Foam::phase::calcMagGradAlpha()
 void Foam::phase::calcStrainRateTensor2Inv()
 {
 	calcMagGradAlpha();
-	volScalarField& alpha = *this;
+	////volScalarField& alpha = *this;
 	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_))*dimensionedScalar(dimensionSet(0,-1,0,0,0),1));
 	invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_)));
 	//dimensionedScalar SR = Foam::min(strainRateTensor2Inv_);
@@ -126,7 +126,7 @@ void Foam::phase::calcStrainRateTensor2Inv()
 	//Info << SR << endl;
 	//strainRateTensor2Inv_ -= Foam::min(strainRateTensor2Inv_);
 	//strainRateTensor2Inv_ -= scalar(1);
-	strainRateTensor2Inv_ *= alpha;
+	////strainRateTensor2Inv_ *= alpha;
     strainRateTensor2Inv_.clip(0, 1);
 	strainRateTensor2Inv_ *= magGradAlpha_;
 	//strainRateTensor2Inv_ /= Foam::max(strainRateTensor2Inv_);
