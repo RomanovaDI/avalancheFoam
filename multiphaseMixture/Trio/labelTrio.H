@@ -6,7 +6,6 @@
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
     Copyright (C) 2011 OpenFOAM Foundation
-    Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,74 +23,48 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::massTransferModels::entrainment
+Typedef
+    Foam::labelTrioTrio
 
 Description
-	Phase that is reduced should be placed first like (soil, water) in
-	entrainment process
+    A pair of labelTrios.
 
-SourceFiles
-    entrainment.C
+Typedef
+    Foam::labelTrioList
+
+Description
+    List of labelTrios.
+
+Typedef
+    Foam::labelTrioUList
+
+Description
+    UList of labelTrios.
+
+Typedef
+    Foam::labelTrioSubList
+
+Description
+    A SubList of labelTrios.
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef entrainment_H
-#define entrainment_H
+#ifndef labelTrio_H
+#define labelTrio_H
 
-#include "massTransferModel.H"
+#include "List.H"
+#include "SubList.H"
+#include "Trio.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace massTransferModels
-{
-
-/*---------------------------------------------------------------------------*\
-                           Class entrainment Declaration
-\*---------------------------------------------------------------------------*/
-
-class entrainment
-:
-    public massTransferModel
-{
-    // Private data
-	const dictionary& dict_;
-	dimensionedScalar entrCoeff_;
-
-public:
-
-    //- Runtime type information
-    TypeName("entrainment");
-
-
-    // Constructors
-
-        //- Construct from components
-        entrainment
-        (
-            const dictionary& interfaceDict,
-            const phase& phase1,
-            const phase& phase2,
-            const phase& phase3
-        );
-
-
-    //- Destructor
-    virtual ~entrainment() = default;
-
-
-    // Member Functions
-
-        tmp<volScalarField> K() const;
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace massTransferModels
-} // End namespace Foam
+    typedef Trio<labelTrio> labelTrioTrio;
+    typedef List<labelTrio> labelTrioList;
+    typedef UList<labelTrio> labelTrioUList;
+    typedef SubList<labelTrio> labelTrioSubList;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

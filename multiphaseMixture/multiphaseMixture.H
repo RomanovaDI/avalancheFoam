@@ -52,7 +52,7 @@ SourceFiles
 #include "volFields.H"
 #include "surfaceFields.H"
 #include "massTransferModel.H"
-
+#include "wordTrioHashes.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -122,10 +122,60 @@ public:
             }
     };
 
-    typedef HashPtrTable<massTransferModel, interfacePair, interfacePair::hash>
+    //- Ordered list of interface names
+    class interfaceTrio
+    :
+        public Trio<word>
+    {
+    public:
+
+        // Always use symmetric hashing
+        using hasher = Trio<word>::hasher;
+
+        // Always use symmetric hashing (alias)
+        using hash = Trio<word>::hasher;
+
+
+        // Constructors
+
+            interfaceTrio() = default;
+
+            interfaceTrio(const word& alpha1Name, const word& alpha2Name, const word& alpha3Name)
+            :
+                Trio<word>(alpha1Name, alpha2Name, alpha3Name)
+            {}
+
+            interfaceTrio(const phase& alpha1, const phase& alpha2, const phase& alpha3)
+            :
+                Trio<word>(alpha1.name(), alpha2.name(), alpha3.name())
+            {}
+
+
+        // Friend Operators
+
+            friend bool operator==
+            (
+                const interfaceTrio& a,
+                const interfaceTrio& b
+            )
+            {
+                return (a == b);
+            }
+
+            friend bool operator!=
+            (
+                const interfaceTrio& a,
+                const interfaceTrio& b
+            )
+            {
+                return (!(a == b));
+            }
+    };
+
+    typedef HashPtrTable<massTransferModel, interfaceTrio, interfaceTrio::hash>
         massTransferModelTable;
 
-    typedef HashPtrTable<volScalarField, interfacePair, interfacePair::hash>
+    typedef HashPtrTable<volScalarField, interfaceTrio, interfaceTrio::hash>
         massTransferCoeffFields;
 
 private:
@@ -152,6 +202,9 @@ private:
 
         typedef HashTable<dictionary, interfacePair, interfacePair::hash>
             interfaceDictTable;
+
+        typedef HashTable<dictionary, interfaceTrio, interfaceTrio::hash>
+            interfaceTrioDictTable;
 
         massTransferModelTable massTransferModels_;
 

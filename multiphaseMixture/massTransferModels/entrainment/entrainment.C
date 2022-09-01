@@ -52,11 +52,12 @@ namespace massTransferModels
 Foam::massTransferModels::entrainment::entrainment
 (
     const dictionary& interfaceDict,
-    const phase& phase1,
-    const phase& phase2
+    const phase& phase1,//liquid
+    const phase& phase2,//soil
+    const phase& phase3 //entrained
 )
 :
-    massTransferModel(interfaceDict, phase1, phase2),
+    massTransferModel(interfaceDict, phase1, phase2, phase3),
 	dict_(interfaceDict.optionalSubDict("entrainmentCoeffs")),
 	entrCoeff_("entrCoeff", dimless, dict_)
 {
@@ -75,8 +76,8 @@ Foam::tmp<Foam::volScalarField> Foam::massTransferModels::entrainment::K() const
 		//	dimensionedScalar(dimensionSet(0,0,-2,0,0), 1),
 		//	phase1_.strainRateTensor2Inv()
 		//	)*
-		phase1_.strainRateTensor2Inv()*
-		//phase1_.magGradAlpha()*
+		phase2_.strainRateTensor2Inv()*
+		phase1_.magGradAlpha()*
 		dimensionedScalar(dimensionSet(0,0,-1,0,0),-1)*
 		entrCoeff_
 		);

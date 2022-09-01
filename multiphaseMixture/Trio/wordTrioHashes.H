@@ -5,8 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011 OpenFOAM Foundation
-    Copyright (C) 2020 OpenCFD Ltd.
+    Copyright (C) 2015 OpenFOAM Foundation
+    Copyright (C) 2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,74 +24,41 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
-Class
-    Foam::massTransferModels::entrainment
+Alias
+    Foam::WordTrioMap
+    A HashTable to objects of type \<T\> with a wordTrio key.
+
+Typedef
+    Foam::wordTrioHashSet
 
 Description
-	Phase that is reduced should be placed first like (soil, water) in
-	entrainment process
+    A HashSet for a wordTrio.
 
-SourceFiles
-    entrainment.C
+Typedef
+    Foam::wordTrioHashTable
+
+Description
+    HashTable of wordTrio
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef entrainment_H
-#define entrainment_H
+#ifndef wordTrioHashes_H
+#define wordTrioHashes_H
 
-#include "massTransferModel.H"
+#include "wordTrio.H"
+#include "HashSet.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace massTransferModels
-{
+    template<class T>
+    using WordTrioMap = HashTable<T, wordTrio, Foam::Hash<wordTrio>>;
 
-/*---------------------------------------------------------------------------*\
-                           Class entrainment Declaration
-\*---------------------------------------------------------------------------*/
+    typedef HashSet<wordTrio, Foam::Hash<wordTrio>> wordTrioHashSet;
 
-class entrainment
-:
-    public massTransferModel
-{
-    // Private data
-	const dictionary& dict_;
-	dimensionedScalar entrCoeff_;
-
-public:
-
-    //- Runtime type information
-    TypeName("entrainment");
-
-
-    // Constructors
-
-        //- Construct from components
-        entrainment
-        (
-            const dictionary& interfaceDict,
-            const phase& phase1,
-            const phase& phase2,
-            const phase& phase3
-        );
-
-
-    //- Destructor
-    virtual ~entrainment() = default;
-
-
-    // Member Functions
-
-        tmp<volScalarField> K() const;
-};
-
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-} // End namespace massTransferModels
-} // End namespace Foam
+    typedef HashTable<word, wordTrio, Foam::Hash<wordTrio>> wordTrioHashTable;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -128,7 +128,7 @@ Foam::multiphaseMixture::multiphaseMixture
 {
     rhoPhi_.setOriented();
 
-	interfaceDictTable massTransferModelsDict(lookup("massTransfer"));
+	interfaceTrioDictTable massTransferModelsDict(lookup("massTransfer"));
 
     forAllConstIters(massTransferModelsDict, iter)
     {
@@ -139,7 +139,8 @@ Foam::multiphaseMixture::multiphaseMixture
             (
                 iter(),
                 *phases_.lookup(iter.key().first()),
-                *phases_.lookup(iter.key().second())
+                *phases_.lookup(iter.key().second()),
+                *phases_.lookup(iter.key().third())
             ).ptr()
         );
     }
