@@ -153,6 +153,23 @@ Foam::multiphaseMixture::multiphaseMixture
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 Foam::tmp<Foam::volScalarField>
+Foam::multiphaseMixture::correctG() const
+{
+    auto iter = phases_.cbegin();
+
+    tmp<volScalarField> tcg = iter()*iter().gFlag();
+    volScalarField& cg = tcg.ref();
+
+    for (++iter; iter != phases_.cend(); ++iter)
+    {
+        cg += iter()*iter().gFlag();
+    }
+
+    return tcg;
+}
+
+
+Foam::tmp<Foam::volScalarField>
 Foam::multiphaseMixture::rho() const
 {
     auto iter = phases_.cbegin();

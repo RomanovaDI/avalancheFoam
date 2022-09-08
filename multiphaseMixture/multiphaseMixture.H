@@ -291,6 +291,9 @@ public:
         }
 
         //- Return the mixture density
+        tmp<volScalarField> correctG() const;
+
+        //- Return the mixture density
         tmp<volScalarField> rho() const;
 
         //- Return the mixture density for patch

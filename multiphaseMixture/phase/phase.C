@@ -64,6 +64,7 @@ Foam::phase::phase
         )
     ),
     rho_("rho", dimDensity, phaseDict_),
+    gFlag_("gFlag", dimless, phaseDict_),
 	U_(U),
 	magGradAlpha_
     (
@@ -146,6 +147,7 @@ bool Foam::phase::read(const dictionary& phaseDict)
     if (nuModel_->read(phaseDict_))
     {
         phaseDict_.readEntry("rho", rho_);
+        phaseDict_.readEntry("gFlag", gFlag_);
 
         return true;
     }

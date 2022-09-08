@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
                 }
             }
 
+            gh = mixture.correctG() * ((g & mesh.C()) - ghRef);
             mixture.calcStrainRateTensors2Inv();
             mixture.solve();
             rho = mixture.rho();

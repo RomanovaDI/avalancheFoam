@@ -63,6 +63,7 @@ class phase
         dictionary phaseDict_;
         autoPtr<viscosityModel> nuModel_;
         dimensionedScalar rho_;
+        dimensionedScalar gFlag_;
         const volVectorField& U_;
 		volScalarField magGradAlpha_;
 		//- Strain rate tensor
@@ -145,6 +146,12 @@ public:
         const dimensionedScalar& rho() const
         {
             return rho_;
+        }
+
+        //- Return const-access to phase1 gFlag
+        const dimensionedScalar& gFlag() const
+        {
+            return gFlag_;
         }
 
 		const volScalarField& magGradAlpha() const
