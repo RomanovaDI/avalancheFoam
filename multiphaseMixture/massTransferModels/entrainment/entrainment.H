@@ -73,8 +73,7 @@ public:
         (
             const dictionary& interfaceDict,
             const phase& phase1,
-            const phase& phase2,
-            const phase& phase3
+            const phase& phase2
         );
 
 

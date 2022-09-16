@@ -43,14 +43,12 @@ Foam::massTransferModel::massTransferModel
 (
     const dictionary& interfaceDict,
     const phase& phase1,
-    const phase& phase2,
-    const phase& phase3
+    const phase& phase2
 )
 :
     interfaceDict_(interfaceDict),
     phase1_(phase1),
     phase2_(phase2),
-    phase3_(phase3),
     residualPhaseFraction_("residualPhaseFraction", dimless, interfaceDict)
     //residualSlip_("residualSlip", dimVelocity, dict)
 {}
@@ -62,8 +60,7 @@ Foam::autoPtr<Foam::massTransferModel> Foam::massTransferModel::New
 (
     const dictionary& interfaceDict,
     const phase& phase1,
-    const phase& phase2,
-    const phase& phase3
+    const phase& phase2
 )
 {
     const word modelType(interfaceDict.get<word>("type"));
@@ -90,8 +87,7 @@ Foam::autoPtr<Foam::massTransferModel> Foam::massTransferModel::New
 	(
 	 	interfaceDict,
 		phase1,
-		phase2,
-		phase3
+		phase2
 	);
 }
 

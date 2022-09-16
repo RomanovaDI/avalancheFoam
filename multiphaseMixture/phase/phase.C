@@ -111,17 +111,18 @@ void Foam::phase::calcMagGradAlpha()
 	//magGradAlpha_ /= magGradAlpha_.weightedAverage(U_.mesh().V());//average();
 	//magGradAlpha_ /= magGradAlpha_.average();
 	magGradAlpha_ *= (scalar(1) - alpha);
-	//magGradAlpha_.clip(0, 1);
+	magGradAlpha_.clip(0, 1);
 	//magGradAlpha_ -= scalar(min(magGradAlpha_));
 	//magGradAlpha_ /= scalar(max(magGradAlpha_));
 }
 
 void Foam::phase::calcStrainRateTensor2Inv()
 {
-	/*calcMagGradAlpha();
+	calcMagGradAlpha();
 	////volScalarField& alpha = *this;
 	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_))*dimensionedScalar(dimensionSet(0,-1,0,0,0),1));
-	invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_)));
+	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_)));
+	strainRateTensor2Inv_ = nuModel_->strainRate();//strainRate();
 	//dimensionedScalar SR = Foam::min(strainRateTensor2Inv_);
 	//scalar SR = min(strainRateTensor2Inv_.primitiveField());
 	//Info << SR << endl;
@@ -130,10 +131,9 @@ void Foam::phase::calcStrainRateTensor2Inv()
 	////strainRateTensor2Inv_ *= alpha;
     strainRateTensor2Inv_.clip(0, 1);
 	strainRateTensor2Inv_ *= magGradAlpha_;
-    strainRateTensor2Inv_.clip(0, 1);
+    //strainRateTensor2Inv_.clip(0, 1);
 	//strainRateTensor2Inv_ /= Foam::max(strainRateTensor2Inv_);
 	//strainRateTensor2Inv_ /= strainRateTensor2Inv_.weightedAverage(U_.mesh().V());//average();*/
-	strainRateTensor2Inv_ = nuModel_->strainRate();//strainRate();
 }
 
 void Foam::phase::correct()

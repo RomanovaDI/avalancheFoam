@@ -58,7 +58,6 @@ protected:
         const dictionary& interfaceDict_;
         const phase& phase1_;//this phase affect
         const phase& phase2_;//this phase is the obgect of affection
-        const phase& phase3_;//this phase is the result of the affection 
         dimensionedScalar residualPhaseFraction_;
 //        dimensionedScalar residualSlip_;
 
@@ -78,10 +77,9 @@ public:
             (
                 const dictionary& interfaceDict,
                 const phase& phase1,
-                const phase& phase2,
-                const phase& phase3
+                const phase& phase2
             ),
-            (interfaceDict, phase1, phase2, phase3)
+            (interfaceDict, phase1, phase2)
         );
 
 
@@ -91,8 +89,7 @@ public:
         (
             const dictionary& interfaceDict,
             const phase& phase1,
-            const phase& phase2,
-            const phase& phase3
+            const phase& phase2
         );
 
 
@@ -106,8 +103,7 @@ public:
         (
             const dictionary& intefaceDict,
             const phase& phase1,
-            const phase& phase2,
-            const phase& phase3
+            const phase& phase2
         );
 
 
@@ -121,11 +117,6 @@ public:
         const phase& phase2() const
         {
             return phase2_;
-        }
-
-        const phase& phase3() const
-        {
-            return phase3_;
         }
 
         const dimensionedScalar& residualPhaseFraction() const
