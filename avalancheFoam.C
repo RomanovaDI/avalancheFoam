@@ -132,18 +132,46 @@ int main(int argc, char *argv[])
                 }
             }
 
-            gh = mixture.correctG() * ((g & mesh.C()) - ghRef);
+            /*gh = mixture.correctG() * ((g & mesh.C()) - ghRef);
+            ghf = fvc::interpolate(mixture.correctG()) * ((g & mesh.Cf()) - ghRef);
+			ghg = gh;
+            MRF.update();
+
+            if (correctPhi)
+            {
+                // Calculate absolute flux
+                // from the mapped surface velocity
+                phi = mesh.Sf() & Uf();
+
+                #include "correctPhi.H"
+
+                // Make the flux relative to the mesh motion
+                fvc::makeRelative(phi, U);
+
+                mixture.correct();
+            }
+
+            if (checkMeshCourantNo)
+            {
+                #include "meshCourantNo.H"
+            }*/
             mixture.calcStrainRateTensors2Inv();
             mixture.solve();
             rho = mixture.rho();
 
             #include "UEqn.H"
 
+			U *= mixture.correctG();
+			phi *= fvc::interpolate(mixture.correctG());
+
             // --- Pressure corrector loop
             while (pimple.correct())
             {
                 #include "pEqn.H"
             }
+
+			U *= mixture.correctG();
+			phi *= fvc::interpolate(mixture.correctG());
 
             if (pimple.turbCorr())
             {

@@ -90,7 +90,7 @@ Foam::phase::phase
             IOobject::AUTO_WRITE
         ),
 		U.mesh(),
-		dimless
+		dimless/dimTime
     )
 {}
 
@@ -118,7 +118,7 @@ void Foam::phase::calcMagGradAlpha()
 
 void Foam::phase::calcStrainRateTensor2Inv()
 {
-	calcMagGradAlpha();
+	/*calcMagGradAlpha();
 	////volScalarField& alpha = *this;
 	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_))*dimensionedScalar(dimensionSet(0,-1,0,0,0),1));
 	invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_)));
@@ -131,7 +131,8 @@ void Foam::phase::calcStrainRateTensor2Inv()
     strainRateTensor2Inv_.clip(0, 1);
 	strainRateTensor2Inv_ *= magGradAlpha_;
 	//strainRateTensor2Inv_ /= Foam::max(strainRateTensor2Inv_);
-	//strainRateTensor2Inv_ /= strainRateTensor2Inv_.weightedAverage(U_.mesh().V());//average();
+	//strainRateTensor2Inv_ /= strainRateTensor2Inv_.weightedAverage(U_.mesh().V());//average();*/
+	strainRateTensor2Inv_ = nuModel_->strainRate();//strainRate();
 }
 
 void Foam::phase::correct()

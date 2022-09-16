@@ -192,6 +192,7 @@ private:
         surfaceScalarField rhoPhi_;
         volScalarField alphas_;
 
+        volScalarField cg_;
         volScalarField nu_;
 
         typedef HashTable<scalar, interfacePair, interfacePair::hash>
@@ -290,8 +291,8 @@ public:
             return rhoPhi_;
         }
 
-        //- Return the mixture density
-        tmp<volScalarField> correctG() const;
+        //- Return the mixture gravity correction coefficient
+        tmp<volScalarField> correctG();
 
         //- Return the mixture density
         tmp<volScalarField> rho() const;
