@@ -79,11 +79,11 @@ Foam::phase::phase
 		U.mesh(),
 		dimless
     ),
-	strainRateTensor2Inv_
+	specificStrainRate_
     (
         IOobject
         (
-            IOobject::groupName("strainRateTensor2Inv", phaseName),
+            IOobject::groupName("specificStrainRate", phaseName),
             U.mesh().time().timeName(),
             U.mesh(),
             IOobject::NO_READ,
@@ -110,30 +110,27 @@ void Foam::phase::calcMagGradAlpha()
 		dimensionedScalar(dimensionSet(0,1,0,0,0),1);
 	//magGradAlpha_ /= magGradAlpha_.weightedAverage(U_.mesh().V());//average();
 	//magGradAlpha_ /= magGradAlpha_.average();
-	magGradAlpha_ *= (scalar(1) - alpha);
-	magGradAlpha_.clip(0, 1);
+	//magGradAlpha_ *= (scalar(1) - alpha);
+	//magGradAlpha_.clip(0, 1);
 	//magGradAlpha_ -= scalar(min(magGradAlpha_));
 	//magGradAlpha_ /= scalar(max(magGradAlpha_));
 }
 
-void Foam::phase::calcStrainRateTensor2Inv()
+void Foam::phase::calcSpecificStrainRate()
 {
 	calcMagGradAlpha();
-	////volScalarField& alpha = *this;
+	volScalarField& alpha = *this;
 	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_))*dimensionedScalar(dimensionSet(0,-1,0,0,0),1));
 	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_)));
-	strainRateTensor2Inv_ = nuModel_->strainRate();//strainRate();
-	//dimensionedScalar SR = Foam::min(strainRateTensor2Inv_);
-	//scalar SR = min(strainRateTensor2Inv_.primitiveField());
-	//Info << SR << endl;
-	//strainRateTensor2Inv_ -= Foam::min(strainRateTensor2Inv_);
-	//strainRateTensor2Inv_ -= scalar(1);
-	////strainRateTensor2Inv_ *= alpha;
-    strainRateTensor2Inv_.clip(0, 1);
-	strainRateTensor2Inv_ *= magGradAlpha_;
-    //strainRateTensor2Inv_.clip(0, 1);
-	//strainRateTensor2Inv_ /= Foam::max(strainRateTensor2Inv_);
-	//strainRateTensor2Inv_ /= strainRateTensor2Inv_.weightedAverage(U_.mesh().V());//average();*/
+	specificStrainRate_ = nuModel_->strainRate();//*dimensionedScalar(dimless*dimTime, 1);//strainRate();
+	//specificStrainRate_ -= Foam::min(strainRateTensor2Inv_);
+	//specificStrainRate_ -= scalar(1);
+	//specificStrainRate_.clip(0, 1);
+	specificStrainRate_ *= magGradAlpha_ * alpha;
+	//specificStrainRate_ /= dimensionedScalar(dimless, 200);
+	//specificStrainRate_ -= dimensionedScalar(dimless/dimTime, 1);
+    //specificStrainRate_.clip(0, 1);
+	//specificStrainRate_ /= Foam::max(strainRateTensor2Inv_);
 }
 
 void Foam::phase::correct()

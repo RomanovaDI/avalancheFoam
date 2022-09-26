@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
             {
                 #include "meshCourantNo.H"
             }*/
-            mixture.calcStrainRateTensors2Inv();
+            mixture.calcSpecificStrainRate();
             mixture.solve();
             rho = mixture.rho();
 

@@ -67,7 +67,7 @@ class phase
         const volVectorField& U_;
 		volScalarField magGradAlpha_;
 		//- Strain rate tensor
-		volScalarField strainRateTensor2Inv_;
+		volScalarField specificStrainRate_;
 
 public:
 
@@ -164,14 +164,14 @@ public:
 			return magGradAlpha_;
 		}
 
-		const volScalarField& strainRateTensor2Inv() const
+		const volScalarField& specificStrainRate() const
 		{
-			return strainRateTensor2Inv_;
+			return specificStrainRate_;
 		}
 
-		volScalarField& strainRateTensor2Inv()
+		volScalarField& specificStrainRate()
 		{
-			return strainRateTensor2Inv_;
+			return specificStrainRate_;
 		}
 
         //- Correct the phase properties
@@ -180,7 +180,7 @@ public:
         void calcMagGradAlpha();
 
         //- Calculate straint rate tensor 2-nd invariant
-        void calcStrainRateTensor2Inv();
+        void calcSpecificStrainRate();
 
         //-Inherit read from volScalarField
         using volScalarField::read;

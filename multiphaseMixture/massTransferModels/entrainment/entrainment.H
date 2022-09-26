@@ -59,6 +59,7 @@ class entrainment
     // Private data
 	const dictionary& dict_;
 	dimensionedScalar entrCoeff_;
+	dimensionedScalar breakingPoint_;
 
 public:
 

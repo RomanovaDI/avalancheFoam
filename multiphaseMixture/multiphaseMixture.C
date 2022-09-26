@@ -177,10 +177,10 @@ Foam::multiphaseMixture::correctG()
         cg_ += iter()*iter().gFlag();
     }
 
-	forAll(cg_, i)
+	/*forAll(cg_, i)
 	{
 		cg_[i] = floor(cg_[i]+1e-04);
-	}
+	}*/
 
     return cg_;
 }
@@ -814,11 +814,11 @@ void Foam::multiphaseMixture::solveAlphas
 }
 
 
-void Foam::multiphaseMixture::calcStrainRateTensors2Inv()
+void Foam::multiphaseMixture::calcSpecificStrainRate()
 {
     for (phase& phase : phases_)
     {
-        phase.calcStrainRateTensor2Inv();
+        phase.calcSpecificStrainRate();
     }
 }
 

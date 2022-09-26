@@ -58,9 +58,11 @@ Foam::massTransferModels::entrainment::entrainment
 :
     massTransferModel(interfaceDict, phase1, phase2),
 	dict_(interfaceDict.optionalSubDict("entrainmentCoeffs")),
-	entrCoeff_("entrCoeff", dimless, dict_)
+	entrCoeff_("entrCoeff", dimless, dict_),
+	breakingPoint_("breakingPoint", dimless, dict_)
 {
 	Info << "entrCoeff = " << entrCoeff_ << endl; 
+	Info << "breakingPoint = " << breakingPoint_ << endl; 
 }
 
 
@@ -69,18 +71,17 @@ Foam::massTransferModels::entrainment::entrainment
 //phase1 - from, phase2 - to
 Foam::tmp<Foam::volScalarField> Foam::massTransferModels::entrainment::K() const
 {
-	//volScalarField& alpha2 = phase2_;
+	tmp<volScalarField> limitedSpecificStrainRate = phase1_.specificStrainRate();
+	limitedSpecificStrainRate = limitedSpecificStrainRate / breakingPoint_;
+	//limitedSpecificStrainRate -= dimencionedScalar(dimless/dimTime, 1);
+	//limitedSpecificStrainRate.clip(0,1);
 	tmp<volScalarField> Kvalue(
-		//min(
-		//	dimensionedScalar(dimensionSet(0,0,-2,0,0), 1),
-		//	phase1_.strainRateTensor2Inv()
-		//	)*
-		phase1_.strainRateTensor2Inv()*
-		//phase1_.magGradAlpha()*
+		limitedSpecificStrainRate*
+		//phase1_.specificStrainRate()/
+		//breakingPoint_*
 		dimensionedScalar(dimensionSet(0,0,0,0,0),-1)*
 		entrCoeff_
 		);
-    
 	return Kvalue;
 }
 

@@ -275,7 +275,7 @@ public:
         void solve();
 
 		//- Calculate strain rate tensors invariants
-		void calcStrainRateTensors2Inv();
+		void calcSpecificStrainRate();
 
         //- Return the table of mass transfer models
         const massTransferModelTable& massTransferModels() const
