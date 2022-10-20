@@ -72,10 +72,15 @@ Foam::massTransferModels::entrainment::entrainment
 Foam::tmp<Foam::volScalarField> Foam::massTransferModels::entrainment::K() const
 {
 	tmp<volScalarField> limitedSpecificStrainRate = phase1_.specificStrainRate();
-	limitedSpecificStrainRate = limitedSpecificStrainRate / breakingPoint_;
+	//limitedSpecificStrainRate = limitedSpecificStrainRate.ref().clip(0,1);
+	limitedSpecificStrainRate = Foam::min(limitedSpecificStrainRate / breakingPoint_, dimensionedScalar(dimless/dimTime, 1.0));
+	forAll(limitedSpecificStrainRate.ref(), i)
+	{
+		limitedSpecificStrainRate.ref()[i] = floor(limitedSpecificStrainRate.ref()[i]+1e-04);
+	}
 	//const volScalarField& alpha1 = phase1_();
 	tmp<volScalarField> alpha1 = phase1_;
-	limitedSpecificStrainRate = limitedSpecificStrainRate * residualPhaseFraction_ / Foam::min(alpha1, residualPhaseFraction_);
+	limitedSpecificStrainRate = limitedSpecificStrainRate * residualPhaseFraction_ / (Foam::min(alpha1, residualPhaseFraction_) + SMALL);
 	/*forAll (limitedSpecificStrainRate, i)
 	{
 		if (alpha1[i] < residualPhaseFraction())

@@ -119,14 +119,14 @@ void Foam::phase::calcMagGradAlpha()
 void Foam::phase::calcSpecificStrainRate()
 {
 	calcMagGradAlpha();
-	volScalarField& alpha = *this;
+	//volScalarField& alpha = *this;
 	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_))*dimensionedScalar(dimensionSet(0,-1,0,0,0),1));
 	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_)));
 	specificStrainRate_ = nuModel_->strainRate();//*dimensionedScalar(dimless*dimTime, 1);//strainRate();
 	//specificStrainRate_ -= Foam::min(strainRateTensor2Inv_);
 	//specificStrainRate_ -= scalar(1);
 	//specificStrainRate_.clip(0, 1);
-	specificStrainRate_ *= magGradAlpha_ * alpha;
+	//specificStrainRate_ *= magGradAlpha_ * alpha;
 	//specificStrainRate_ /= dimensionedScalar(dimless, 200);
 	//specificStrainRate_ -= dimensionedScalar(dimless/dimTime, 1);
     //specificStrainRate_.clip(0, 1);
