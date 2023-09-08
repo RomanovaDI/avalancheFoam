@@ -66,6 +66,19 @@ Foam::phase::phase
     rho_("rho", dimDensity, phaseDict_),
     gFlag_("gFlag", dimless, phaseDict_),
 	U_(U),
+	magU_
+    (
+        IOobject
+        (
+            IOobject::groupName("magU", phaseName),
+            U.mesh().time().timeName(),
+            U.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+		U.mesh(),
+		dimLength/dimTime
+    ),
 	magGradAlpha_
     (
         IOobject
@@ -78,6 +91,19 @@ Foam::phase::phase
         ),
 		U.mesh(),
 		dimless
+    ),
+	magGradStrainRate_
+    (
+        IOobject
+        (
+            IOobject::groupName("magGradStrainRate", phaseName),
+            U.mesh().time().timeName(),
+            U.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+		U.mesh(),
+		dimless/(dimTime*dimLength)
     ),
 	specificStrainRate_
     (
@@ -103,6 +129,17 @@ Foam::autoPtr<Foam::phase> Foam::phase::clone() const
     return nullptr;
 }
 
+void Foam::phase::calcMagU()
+{
+	magU_ = mag(U_);
+	//magGradAlpha_ /= magGradAlpha_.weightedAverage(U_.mesh().V());//average();
+	//magGradAlpha_ /= magGradAlpha_.average();
+	//magGradAlpha_ *= (scalar(1) - alpha);
+	//magGradAlpha_.clip(0, 1);
+	//magGradAlpha_ -= scalar(min(magGradAlpha_));
+	//magGradAlpha_ /= scalar(max(magGradAlpha_));
+}
+
 void Foam::phase::calcMagGradAlpha()
 {
 	volScalarField& alpha = *this;
@@ -118,6 +155,7 @@ void Foam::phase::calcMagGradAlpha()
 
 void Foam::phase::calcSpecificStrainRate()
 {
+	calcMagU();
 	calcMagGradAlpha();
 	//volScalarField& alpha = *this;
 	//invariantII(strainRateTensor2Inv_, symm(fvc::grad(U_))*dimensionedScalar(dimensionSet(0,-1,0,0,0),1));
@@ -131,6 +169,7 @@ void Foam::phase::calcSpecificStrainRate()
 	//specificStrainRate_ -= dimensionedScalar(dimless/dimTime, 1);
     //specificStrainRate_.clip(0, 1);
 	//specificStrainRate_ /= Foam::max(strainRateTensor2Inv_);
+	magGradStrainRate_ = mag(fvc::grad(specificStrainRate_));
 }
 
 void Foam::phase::correct()

@@ -71,7 +71,7 @@ Foam::massTransferModels::entrainment::entrainment
 //phase1 - from, phase2 - to
 Foam::tmp<Foam::volScalarField> Foam::massTransferModels::entrainment::K() const
 {
-	tmp<volScalarField> limitedSpecificStrainRate = phase1_.specificStrainRate();
+	/*tmp<volScalarField> limitedSpecificStrainRate = phase1_.specificStrainRate();
 	//limitedSpecificStrainRate = limitedSpecificStrainRate.ref().clip(0,1);
 	limitedSpecificStrainRate = Foam::min(limitedSpecificStrainRate / breakingPoint_, dimensionedScalar(dimless/dimTime, 1.0));
 	forAll(limitedSpecificStrainRate.ref(), i)
@@ -81,19 +81,34 @@ Foam::tmp<Foam::volScalarField> Foam::massTransferModels::entrainment::K() const
 	//const volScalarField& alpha1 = phase1_();
 	tmp<volScalarField> alpha1 = phase1_;
 	limitedSpecificStrainRate = limitedSpecificStrainRate * residualPhaseFraction_ / (Foam::min(alpha1, residualPhaseFraction_) + SMALL);
-	/*forAll (limitedSpecificStrainRate, i)
-	{
-		if (alpha1[i] < residualPhaseFraction())
-			limitedSpecificStrainRate[i] *= VGREAT;
-	}*/
+	//forAll (limitedSpecificStrainRate, i)
+	//{
+	//	if (alpha1[i] < residualPhaseFraction())
+	//		limitedSpecificStrainRate[i] *= VGREAT;
+	//}
 	//limitedSpecificStrainRate -= dimencionedScalar(dimless/dimTime, 1);
-	//limitedSpecificStrainRate.clip(0,1);
+	//limitedSpecificStrainRate.clip(0,1);*/
+	tmp<volScalarField> limitedSpecificStrainRate = phase1_.specificStrainRate();
+	tmp<volScalarField> alpha1 = phase1_;
+	tmp<volScalarField> erDepth = phase1_.magU() / (dimensionedScalar(dimless/dimTime, SMALL) + limitedSpecificStrainRate);
+	limitedSpecificStrainRate = \
+		Foam::min(\
+			Foam::max(\
+				(limitedSpecificStrainRate - breakingPoint_*dimensionedScalar(dimless/dimTime, 1.0)) * GREAT,\
+				dimensionedScalar(dimless/dimTime, 0.0)\
+			),\
+			dimensionedScalar(dimless/dimTime, 1.0)\
+		);
+	//		/ (phase1_.magGradStrainRate()+SMALL*dimensionedScalar(dimless/(dimLength*dimTime), 1.0));
+	/////////////////////////////////////////
 	tmp<volScalarField> Kvalue(
-		limitedSpecificStrainRate*
-		//phase1_.specificStrainRate()/
-		//breakingPoint_*
-		dimensionedScalar(dimensionSet(0,0,0,0,0),-1)*
-		entrCoeff_
+			//Foam::min(
+				erDepth * limitedSpecificStrainRate * entrCoeff_ * dimensionedScalar(dimless/dimLength, 1.0)//,
+			//	alpha1
+			//)
+			//phase1_.specificStrainRate()/
+			//breakingPoint_*
+			//dimensionedScalar(dimensionSet(0,0,0,0,0),-1)*
 		);
 	return Kvalue;
 }

@@ -65,8 +65,10 @@ class phase
         dimensionedScalar rho_;
         dimensionedScalar gFlag_;
         const volVectorField& U_;
+		volScalarField magU_;
 		volScalarField magGradAlpha_;
-		//- Strain rate tensor
+		volScalarField magGradStrainRate_;
+		//- Strain rate tensor second invariant
 		volScalarField specificStrainRate_;
 
 public:
@@ -154,6 +156,16 @@ public:
             return gFlag_;
         }
 
+		const volScalarField& magU() const
+		{
+			return magU_;
+		}
+
+		volScalarField& magU()
+		{
+			return magU_;
+		}
+
 		const volScalarField& magGradAlpha() const
 		{
 			return magGradAlpha_;
@@ -162,6 +174,16 @@ public:
 		volScalarField& magGradAlpha()
 		{
 			return magGradAlpha_;
+		}
+
+		const volScalarField& magGradStrainRate() const
+		{
+			return magGradStrainRate_;
+		}
+
+		volScalarField& magGradStrainRate()
+		{
+			return magGradStrainRate_;
 		}
 
 		const volScalarField& specificStrainRate() const
@@ -176,6 +198,8 @@ public:
 
         //- Correct the phase properties
         void correct();
+
+        void calcMagU();
 
         void calcMagGradAlpha();
 

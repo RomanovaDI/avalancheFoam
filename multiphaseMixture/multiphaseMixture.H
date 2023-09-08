@@ -299,6 +299,12 @@ public:
 			const massTransferCoeffFields& massTransferCoeffs
 		) const;
 
+		/*void correctAlphas
+		(
+		 	phase& phase1,
+			phase& phase2
+		);*/
+
         //- Correct the mixture properties
         void correct();
 

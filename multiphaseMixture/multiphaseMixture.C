@@ -632,6 +632,14 @@ void Foam::multiphaseMixture::solveAlphas
     const scalar cAlpha
 )
 {
+    /*for (phase& phase1 : phases_)
+    {
+		for (phase& phase2 : phases_)
+		{
+			correctAlphas(phase1, phase2);
+		}
+	}*/
+
     static label nSolves(-1);
     ++nSolves;
 
@@ -868,6 +876,8 @@ Foam::tmp<Foam::volScalarField>Foam::multiphaseMixture::mtmSp
 			)
 		)
 	);
+	//volScalarField& SpNC  = tmtmSp();
+	//volScalarField S ("S", SpNC);
 	massTransferModelTable::const_iterator mtmIter = massTransferModels_.begin();
 	massTransferCoeffFields::const_iterator cIter = massTransferCoeffField.begin();
 	for
@@ -879,8 +889,17 @@ Foam::tmp<Foam::volScalarField>Foam::multiphaseMixture::mtmSp
 	{
 		if (&phasei == &mtmIter()->phase1())
 		{
+			const phase *phasePtr = &mtmIter()->phase1();
+			const volScalarField alpha = *phasePtr;
 			const volScalarField Sp = *cIter();
+			//tmtmSp.ref() = - Sp * alpha / ((alpha * alpha + SMALL) * mesh_.time().deltaT().value() * dimensionedScalar(dimTime*dimLength, 1.0));
+			//tmtmSp.ref().primitiveFieldRef() /= Foam::pow(mesh_.V(), 0.3333);
+			//tmtmSp.ref() = Foam::min(Foam::max(tmtmSp.ref(), - alpha / dimensionedScalar(dimTime, 1.0)), dimensionedScalar(dimless/dimTime, 0.0));
 			tmtmSp.ref() = Sp;
+			tmtmSp.ref().primitiveFieldRef() /= Foam::pow(mesh_.V(), 0.3333);
+			tmtmSp.ref() = Foam::min(tmtmSp.ref(), alpha / dimensionedScalar(dimTime, 1.0));
+			tmtmSp.ref() = - tmtmSp.ref() / (SMALL + alpha);
+			//tmtmSp.ref() = -1;
 		}
 	}
 	return tmtmSp;
@@ -926,11 +945,43 @@ Foam::tmp<Foam::volScalarField>Foam::multiphaseMixture::mtmSu
 			const phase *phasePtr = &mtmIter()->phase1();
 			const volScalarField alpha = *phasePtr;
 			const volScalarField Su = *cIter();
-			tmtmSu.ref() = Su*alpha*scalar(-1);
+			//tmtmSu.ref() = Su * alpha * alpha / ((alpha * alpha + SMALL) * mesh_.time().deltaT().value()*dimensionedScalar(dimTime*dimLength, 1.0));
+			//tmtmSu.ref().primitiveFieldRef() /= Foam::pow(mesh_.V(), 0.3333);
+			//tmtmSu.ref() = Foam::max(Foam::min(tmtmSu.ref(), alpha / dimensionedScalar(dimTime, 1.0)), dimensionedScalar(dimless/dimTime, 0.0));
+			tmtmSu.ref() = Su;
+			tmtmSu.ref().primitiveFieldRef() /= Foam::pow(mesh_.V(), 0.3333);
+			tmtmSu.ref() = Foam::min(tmtmSu.ref(), alpha / dimensionedScalar(dimTime, 1.0));
+			//tmtmSu.ref() = alpha;
 		}
 	}
-	return tmtmSu;
+	return tmtmSu;// / (mesh_.V().field());// * mesh_.time().deltaT().value());
 }
+
+
+/*void Foam::multiphaseMixture::correctAlphas
+(
+	phase& phase1,
+	phase& phase2
+)
+{
+	massTransferModelTable::const_iterator mtmIter = massTransferModels_.begin();
+	for
+	(
+		;
+    	mtmIter.good();
+		++mtmIter
+	)
+	{
+		if (&phase1 == &mtmIter()->phase1() &&
+			&phase1 < &mtmIter()->residualPhaseFraction() &&
+			&phase2 == &mtmIter()->phase2())
+		{
+			phase2 += phase1;
+			phase1 = 0;
+		}
+	}
+	return;
+}*/
 
 
 bool Foam::multiphaseMixture::read()
