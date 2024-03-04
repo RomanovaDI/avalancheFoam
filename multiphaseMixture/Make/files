@@ -6,4 +6,6 @@ massTransfer = massTransferModels
 $(massTransfer)/massTransferModel/massTransferModel.C
 $(massTransfer)/entrainment/entrainment.C
 
+#LIB = $(FOAM_LIBBIN)/libmultiphaseInterFoam
+#LIB = $(FOAM_USER_LIBBIN)/libavalancheFoam
 LIB = $(FOAM_USER_LIBBIN)/libavalancheMultiphaseMixture
