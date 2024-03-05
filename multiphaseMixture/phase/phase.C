@@ -65,6 +65,7 @@ Foam::phase::phase
     ),
     rho_("rho", dimDensity, phaseDict_),
     gFlag_("gFlag", dimless, phaseDict_),
+    UFlag_("UFlag", dimless, phaseDict_),
 	U_(U),
 	magU_
     (

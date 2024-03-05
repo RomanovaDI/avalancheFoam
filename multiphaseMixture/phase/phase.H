@@ -64,6 +64,7 @@ class phase
         autoPtr<viscosityModel> nuModel_;
         dimensionedScalar rho_;
         dimensionedScalar gFlag_;
+        dimensionedScalar UFlag_;
         const volVectorField& U_;
 		volScalarField magU_;
 		volScalarField magGradAlpha_;
@@ -155,6 +156,17 @@ public:
         {
             return gFlag_;
         }
+
+        //- Return const-access to phase1 UFlag
+        const dimensionedScalar& UFlag() const
+        {
+            return UFlag_;
+        }
+
+		const volVectorField& U() const
+		{
+			return U_;
+		}
 
 		const volScalarField& magU() const
 		{

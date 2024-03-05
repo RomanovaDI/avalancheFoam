@@ -121,6 +121,20 @@ Foam::multiphaseMixture::multiphaseMixture
         dimensionedScalar(dimless, Zero)
     ),
 
+    cU_
+    (
+        IOobject
+        (
+            "cU",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedVector(dimless, Zero)
+    ),
+
     nu_
     (
         IOobject
@@ -164,6 +178,27 @@ Foam::multiphaseMixture::multiphaseMixture
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
+
+Foam::tmp<Foam::volScalarField>
+Foam::multiphaseMixture::correctU()
+{
+    auto iter = phases_.cbegin();
+
+	cU_ *= 0.0;
+
+    for (;iter != phases_.cend(); ++iter)
+    {
+        U_ += iter()*iter().UFlag();
+    }
+
+	/*forAll(cg_, i)
+	{
+		cg_[i] = floor(cg_[i]+1e-04);
+	}*/
+
+    return cU_;
+}
+
 
 Foam::tmp<Foam::volScalarField>
 Foam::multiphaseMixture::correctG()
